@@ -12,12 +12,23 @@ export function LoginScreen() {
   const { login, loading } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
 
   const handleLogin = async () => {
+    setError('');
     if (!email.trim() || !password.trim()) return;
-    const user = await login(email.trim(), password.trim());
-    if (user) {
-      router.replace('/(chat)/list');
+    try {
+      const user = await login(email.trim(), password.trim());
+      if (user) {
+        router.replace('/(chat)/list');
+      }
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : '';
+      if (msg.toLowerCase().includes('invalid login credentials')) {
+        setError('Correo o contraseña incorrectos');
+      } else {
+        setError(msg || 'Error al iniciar sesión');
+      }
     }
   };
 
@@ -54,6 +65,8 @@ export function LoginScreen() {
             secureTextEntry
           />
         </FormSection>
+
+        {error ? <ErrorMessage>{error}</ErrorMessage> : null}
 
         <ButtonGroup>
           <CustomButton
@@ -149,6 +162,14 @@ const Footer = styled.View`
   justify-content: center;
   margin-top: 32px;
   margin-bottom: 40px;
+`;
+
+const ErrorMessage = styled.Text`
+  color: #dc2626;
+  font-size: 14px;
+  font-weight: 500;
+  text-align: center;
+  margin-bottom: 16px;
 `;
 
 const FooterText = styled.Text`

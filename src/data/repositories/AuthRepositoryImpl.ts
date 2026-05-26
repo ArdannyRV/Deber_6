@@ -17,17 +17,6 @@ export class AuthRepositoryImpl implements IAuthRepository {
     if (error) throw new Error(error.message);
     if (!data.user) throw new Error('No se pudo crear el usuario');
 
-    const { error: profileError } = await supabase.from('profiles').upsert(
-      {
-        id: data.user.id,
-        name,
-        email,
-        role,
-      },
-      { onConflict: 'id' },
-    );
-    if (profileError) throw new Error(profileError.message);
-
     return { id: data.user.id, name, email, role };
   }
 

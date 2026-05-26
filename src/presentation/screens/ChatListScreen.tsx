@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { FlatList, TouchableOpacity } from 'react-native';
 import styled from 'styled-components/native';
-import { useRouter, useLocalSearchParams } from 'expo-router';
+import { useRouter } from 'expo-router';
 import { useAuth } from '@/presentation/hooks/useAuth';
 import { ChatRepositoryImpl } from '@/data/repositories/ChatRepositoryImpl';
 import { GetAvailableUsersUseCase } from '@/domain/usecases/GetAvailableUsersUseCase';
@@ -14,41 +14,36 @@ const getAvailableUsers = new GetAvailableUsersUseCase(chatRepo);
 
 export function ChatListScreen() {
   const router = useRouter();
-  const { userId, userRole, userName } = useLocalSearchParams<{
-    userId: string;
-    userRole: string;
-    userName: string;
-  }>();
-  const { logout, loading: authLoading } = useAuth();
+  const { user, logout, loading: authLoading } = useAuth();
 
   const [users, setUsers] = useState<User[]>([]);
   const [usersLoading, setUsersLoading] = useState(true);
 
   const oppositeRole =
-    userRole === 'vendedor' ? 'cliente' : 'vendedor';
+    user?.role === 'vendedor' ? 'cliente' : 'vendedor';
 
   useEffect(() => {
+    if (!user) return;
+    setUsersLoading(true);
     getAvailableUsers
-      .execute(oppositeRole as 'vendedor' | 'cliente', userId)
+      .execute(oppositeRole as 'vendedor' | 'cliente', user.id)
       .then(setUsers)
       .finally(() => setUsersLoading(false));
-  }, [oppositeRole]);
+  }, [user?.id, user?.role]);
 
   const handleUserPress = useCallback(
     (receiver: User) => {
+      if (!user) return;
       router.push({
         pathname: '/(chat)/room/[id]',
         params: {
           id: receiver.id,
-          userId,
-          userRole,
-          userName,
           receiverName: receiver.name,
           receiverRole: receiver.role,
         },
       });
     },
-    [router, userId, userRole, userName],
+    [router, user],
   );
 
   const handleLogout = async () => {
@@ -72,6 +67,16 @@ export function ChatListScreen() {
       <Chevron>{'›'}</Chevron>
     </UserCard>
   );
+
+  if (!user) {
+    return (
+      <Container>
+        <LoaderWrapper>
+          <LoaderLottie size={80} />
+        </LoaderWrapper>
+      </Container>
+    );
+  }
 
   return (
     <Container>

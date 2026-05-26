@@ -5,35 +5,32 @@ import {
   Platform,
   TouchableOpacity,
   Keyboard,
+  Alert,
 } from 'react-native';
 import styled from 'styled-components/native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useAuth } from '@/presentation/hooks/useAuth';
 import { useChat } from '@/presentation/hooks/useChat';
 import { MessageBubble } from '@/presentation/components/chat/MessageBubble';
 import { Message } from '@/domain/entities/Message';
 
 export function ChatScreen() {
   const router = useRouter();
-  const {
-    id: receiverId,
-    userId,
-    userRole,
-    receiverName,
-    receiverRole,
-  } = useLocalSearchParams<{
-    id: string;
-    userId: string;
-    userName: string;
-    userRole: string;
-    receiverName: string;
-    receiverRole: string;
-  }>();
+  const { user } = useAuth();
+  const { id: receiverId, receiverName, receiverRole } =
+    useLocalSearchParams<{
+      id: string;
+      receiverName: string;
+      receiverRole: string;
+    }>();
 
   const [inputText, setInputText] = useState('');
   const flatListRef = useRef<FlatList<Message>>(null);
 
+  const currentUserId = user?.id ?? '';
+
   const { messages, sendMessage } = useChat({
-    currentUserId: userId ?? '',
+    currentUserId,
     receiverId: receiverId ?? '',
   });
 
@@ -41,13 +38,17 @@ export function ChatScreen() {
     const text = inputText.trim();
     if (!text) return;
     Keyboard.dismiss();
-    setInputText('');
-    await sendMessage(text);
-    setTimeout(() => flatListRef.current?.scrollToEnd({ animated: true }), 100);
+    try {
+      await sendMessage(text);
+      setInputText('');
+      setTimeout(() => flatListRef.current?.scrollToEnd({ animated: true }), 100);
+    } catch {
+      Alert.alert('Error', 'No se pudo enviar el mensaje');
+    }
   };
 
   const renderMessage = ({ item }: { item: Message }) => (
-    <MessageBubble message={item} isOwn={item.senderId === userId} />
+    <MessageBubble message={item} isOwn={item.senderId === currentUserId} />
   );
 
   return (
