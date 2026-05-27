@@ -12,7 +12,7 @@ interface Props {
 export function GlassHeader({ title, subtitle, onBackPress, rightElement }: Props) {
   return (
     <HeaderWrapper>
-      <StyledBlur intensity={40} tint="light">
+      <StyledBlur intensity={80} tint="light">
         <Content>
           <Side>{onBackPress ? <BackButton onPress={onBackPress}><Arrow>{'‹'}</Arrow></BackButton> : null}</Side>
           <Center>

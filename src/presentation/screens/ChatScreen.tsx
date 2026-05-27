@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   Keyboard,
   Alert,
+  ImageBackground,
 } from 'react-native';
 import styled from 'styled-components/native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -56,11 +57,11 @@ export function ChatScreen() {
 
   return (
     <KeyboardAvoidingView
-      style={{ flex: 1, backgroundColor: theme.colors.backgroundBase }}
+      style={{ flex: 1 }}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
     >
-      <Container>
+      <ChatBackground source={require('../../../assets/images/fondo_chats.png')}>
         <GlassHeader
           title={receiverName ?? 'Chat'}
           subtitle={receiverRole === 'vendedor' ? 'Vendedor' : 'Cliente'}
@@ -82,24 +83,23 @@ export function ChatScreen() {
               value={inputText}
               onChangeText={setInputText}
               placeholder="Escribe un mensaje..."
-              placeholderTextColor={theme.colors.textMuted}
+              placeholderTextColor="rgba(75, 85, 99, 0.7)"
               onSubmitEditing={handleSend}
               onFocus={() => setIsInputFocused(true)}
               onBlur={() => setIsInputFocused(false)}
             />
             <SendButton onPress={handleSend} disabled={!inputText.trim()}>
-              <SendIcon>{'→'}</SendIcon>
+              <SendIcon>{'➤'}</SendIcon>
             </SendButton>
           </InputRow>
         </InputBar>
-      </Container>
+      </ChatBackground>
     </KeyboardAvoidingView>
   );
 }
 
-const Container = styled.View`
+const ChatBackground = styled(ImageBackground)`
   flex: 1;
-  background-color: ${theme.colors.backgroundBase};
 `;
 
 const MessageList = styled(FlatList)`
@@ -110,15 +110,15 @@ const MessageList = styled(FlatList)`
 const InputBar = styled.View<{ $isFocused: boolean }>`
   margin: 8px 16px 36px;
   border-radius: 28px;
-  background-color: ${theme.colors.surface};
+  background-color: rgba(255, 255, 255, 0.9);
   border-width: 2px;
   border-color: ${({ $isFocused }) =>
-    $isFocused ? theme.colors.borderFocus : theme.colors.border};
+    $isFocused ? theme.colors.borderFocus : 'rgba(255, 255, 255, 0.4)'};
   padding: 6px 6px 6px 18px;
   elevation: 2;
   shadow-color: #000;
   shadow-offset: 0px 2px;
-  shadow-opacity: 0.06;
+  shadow-opacity: 0.08;
   shadow-radius: 6px;
 `;
 
@@ -146,6 +146,6 @@ const SendButton = styled(TouchableOpacity)<{ disabled?: boolean }>`
 
 const SendIcon = styled.Text`
   color: ${theme.colors.white};
-  font-size: 20px;
-  line-height: 20px;
+  font-size: 24px;
+  line-height: 26px;
 `;

@@ -37,7 +37,7 @@ export function LoginScreen() {
 
   return (
     <KeyboardAvoidingView
-      style={{ flex: 1, backgroundColor: theme.colors.backgroundBase }}
+      style={{ flex: 1, backgroundColor: 'transparent' }}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
       <AnimatedBackground>
@@ -114,11 +114,6 @@ const GradientTop = styled(LinearGradient).attrs({
   border-bottom-left-radius: 40px;
   border-bottom-right-radius: 40px;
   overflow: hidden;
-  elevation: 8;
-  shadow-color: ${theme.colors.primary};
-  shadow-offset: 0px 6px;
-  shadow-opacity: 0.3;
-  shadow-radius: 16px;
 `;
 
 const LogoSection = styled.View`
@@ -144,11 +139,11 @@ const Subtitle = styled.Text`
 
 const FormCard = styled.View`
   margin: -30px 24px 0;
-  background-color: ${theme.colors.surface};
+  background-color: rgba(255, 255, 255, 0.15);
   border-radius: ${theme.borderRadius.xl}px;
   padding: 32px 24px;
   border-width: 1px;
-  border-color: ${theme.colors.border};
+  border-color: rgba(255, 255, 255, 0.25);
 `;
 
 const Spacer = styled.View`
