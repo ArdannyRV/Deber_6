@@ -6,8 +6,10 @@ import { useAuth } from '@/presentation/hooks/useAuth';
 import { ChatRepositoryImpl } from '@/data/repositories/ChatRepositoryImpl';
 import { GetAvailableUsersUseCase } from '@/domain/usecases/GetAvailableUsersUseCase';
 import { User } from '@/domain/entities/User';
-import { LoaderLottie } from '@/presentation/components/ui/LoaderLottie';
+import { GlassHeader } from '@/presentation/components/ui/GlassHeader';
 import { LogoutButton } from '@/presentation/components/ui/LogoutButton';
+import { LoaderLottie } from '@/presentation/components/ui/LoaderLottie';
+import { theme } from '@/presentation/theme/theme';
 
 const chatRepo = new ChatRepositoryImpl();
 const getAvailableUsers = new GetAvailableUsersUseCase(chatRepo);
@@ -80,15 +82,11 @@ export function ChatListScreen() {
 
   return (
     <Container>
-      <Header>
-        <HeaderLeft>
-          <HeaderTitle>Mis Chats</HeaderTitle>
-          <HeaderSubtitle>
-            {oppositeRole === 'vendedor' ? 'Vendedores' : 'Clientes'} disponibles
-          </HeaderSubtitle>
-        </HeaderLeft>
-        <LogoutButton onPress={handleLogout} loading={authLoading} />
-      </Header>
+      <GlassHeader
+        title="Mis Chats"
+        subtitle={`${oppositeRole === 'vendedor' ? 'Vendedores' : 'Clientes'} disponibles`}
+        rightElement={<LogoutButton onPress={handleLogout} loading={authLoading} />}
+      />
 
       {usersLoading ? (
         <LoaderWrapper>
@@ -99,7 +97,7 @@ export function ChatListScreen() {
           data={users}
           keyExtractor={(item: User) => item.id}
           renderItem={renderUser}
-          contentContainerStyle={{ padding: 16, gap: 12 }}
+          contentContainerStyle={{ padding: 16, paddingTop: 110, gap: 12 }}
           ListEmptyComponent={
             <EmptyState>
               <EmptyIcon>👥</EmptyIcon>
@@ -115,33 +113,7 @@ export function ChatListScreen() {
 
 const Container = styled.View`
   flex: 1;
-  background-color: #f9fafb;
-`;
-
-const Header = styled.View`
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-  background-color: #ffffff;
-  padding: 60px 20px 20px;
-  border-bottom-width: 1px;
-  border-bottom-color: #e5e7eb;
-`;
-
-const HeaderLeft = styled.View`
-  flex: 1;
-`;
-
-const HeaderTitle = styled.Text`
-  font-size: 24px;
-  font-weight: 700;
-  color: #111827;
-`;
-
-const HeaderSubtitle = styled.Text`
-  font-size: 14px;
-  color: #6b7280;
-  margin-top: 2px;
+  background-color: ${theme.colors.backgroundBase};
 `;
 
 const UserList = styled(FlatList)`
@@ -151,29 +123,33 @@ const UserList = styled(FlatList)`
 const UserCard = styled(TouchableOpacity)`
   flex-direction: row;
   align-items: center;
-  background-color: #ffffff;
-  border-radius: 16px;
+  background-color: ${theme.colors.surface};
+  border-radius: ${theme.borderRadius.lg}px;
   padding: 16px;
-  elevation: 2;
+  border-width: 1px;
+  border-color: ${theme.colors.border};
+  elevation: 1;
   shadow-color: #000;
   shadow-offset: 0px 1px;
-  shadow-opacity: 0.08;
-  shadow-radius: 4px;
+  shadow-opacity: 0.04;
+  shadow-radius: 3px;
 `;
 
 const Avatar = styled.View`
-  width: 50px;
-  height: 50px;
-  border-radius: 25px;
-  background-color: #2563eb;
+  width: 48px;
+  height: 48px;
+  border-radius: 24px;
+  background-color: #DBEAFE;
   align-items: center;
   justify-content: center;
   margin-right: 14px;
+  border-width: 1.5px;
+  border-color: ${theme.colors.primary};
 `;
 
 const AvatarText = styled.Text`
-  color: #ffffff;
-  font-size: 20px;
+  color: ${theme.colors.primary};
+  font-size: 18px;
   font-weight: 700;
 `;
 
@@ -184,28 +160,28 @@ const UserInfo = styled.View`
 const UserName = styled.Text`
   font-size: 16px;
   font-weight: 600;
-  color: #111827;
+  color: ${theme.colors.textMain};
   margin-bottom: 4px;
 `;
 
 const UserRoleBadge = styled.View<{ $role: string }>`
   align-self: flex-start;
   padding: 3px 10px;
-  border-radius: 8px;
+  border-radius: ${theme.borderRadius.sm}px;
   background-color: ${({ $role }) =>
-    $role === 'vendedor' ? '#dbeafe' : '#d1fae5'};
+    $role === 'vendedor' ? '#DBEAFE' : '#D1FAE5'};
 `;
 
 const UserRoleText = styled.Text<{ $role: string }>`
   font-size: 12px;
   font-weight: 600;
   color: ${({ $role }) =>
-    $role === 'vendedor' ? '#1d4ed8' : '#065f46'};
+    $role === 'vendedor' ? '#1D4ED8' : '#065F46'};
 `;
 
 const Chevron = styled.Text`
   font-size: 24px;
-  color: #9ca3af;
+  color: ${theme.colors.textMuted};
   margin-left: 8px;
 `;
 
@@ -218,7 +194,7 @@ const LoaderWrapper = styled.View`
 const EmptyState = styled.View`
   align-items: center;
   justify-content: center;
-  margin-top: 80px;
+  margin-top: 100px;
 `;
 
 const EmptyIcon = styled.Text`
@@ -229,11 +205,11 @@ const EmptyIcon = styled.Text`
 const EmptyText = styled.Text`
   font-size: 18px;
   font-weight: 600;
-  color: #374151;
+  color: ${theme.colors.textMain};
 `;
 
 const EmptySubtext = styled.Text`
   font-size: 14px;
-  color: #9ca3af;
+  color: ${theme.colors.textMuted};
   margin-top: 4px;
 `;

@@ -1,11 +1,14 @@
 import { useState } from 'react';
 import { KeyboardAvoidingView, Platform } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import LottieView from 'lottie-react-native';
 import styled from 'styled-components/native';
 import { useRouter } from 'expo-router';
 import { useAuth } from '@/presentation/hooks/useAuth';
 import { CustomButton } from '@/presentation/components/ui/CustomButton';
 import { CustomInput } from '@/presentation/components/ui/CustomInput';
-import { LoaderLottie } from '@/presentation/components/ui/LoaderLottie';
+import { AnimatedBackground } from '@/presentation/components/ui/AnimatedBackground';
+import { theme } from '@/presentation/theme/theme';
 
 export function LoginScreen() {
   const router = useRouter();
@@ -34,153 +37,153 @@ export function LoginScreen() {
 
   return (
     <KeyboardAvoidingView
-      style={{ flex: 1, backgroundColor: '#ffffff' }}
+      style={{ flex: 1, backgroundColor: theme.colors.backgroundBase }}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
-      <Container>
-        <HeaderSection>
-          <LogoIcon>
-            <LogoText>C</LogoText>
-          </LogoIcon>
-          <Title>Chat Comercio</Title>
-          <Subtitle>
-            Conecta con vendedores y clientes en tiempo real
-          </Subtitle>
-        </HeaderSection>
+      <AnimatedBackground>
+        <ScrollContainer>
+          <GradientTop>
+            <LogoSection>
+              <LottieContainer>
+                <LottieView
+                  source={require('../../../assets/animations/animacion_de_inicio.json')}
+                  autoPlay
+                  loop
+                  style={{ width: 120, height: 120 }}
+                />
+              </LottieContainer>
+              <Title>Chat Comercio</Title>
+              <Subtitle>Conecta con vendedores y clientes en tiempo real</Subtitle>
+            </LogoSection>
+          </GradientTop>
 
-        <FormSection>
-          <CustomInput
-            value={email}
-            onChangeText={setEmail}
-            placeholder="Correo electrónico"
-            keyboardType="email-address"
-            autoCapitalize="none"
-            autoCorrect={false}
-          />
-          <Spacer />
-          <CustomInput
-            value={password}
-            onChangeText={setPassword}
-            placeholder="Contraseña"
-            secureTextEntry
-          />
-        </FormSection>
+          <FormCard>
+            <CustomInput
+              value={email}
+              onChangeText={setEmail}
+              placeholder="Correo electrónico"
+              keyboardType="email-address"
+              autoCapitalize="none"
+              autoCorrect={false}
+            />
+            <Spacer />
+            <CustomInput
+              value={password}
+              onChangeText={setPassword}
+              placeholder="Contraseña"
+              secureTextEntry
+            />
 
-        {error ? <ErrorMessage>{error}</ErrorMessage> : null}
+            {error ? <ErrorMessage>{error}</ErrorMessage> : null}
 
-        <ButtonGroup>
-          <CustomButton
-            title="Iniciar Sesión"
-            onPress={handleLogin}
-            loading={loading}
-            variant="primary"
-          />
-        </ButtonGroup>
+            <ButtonWrapper>
+              <CustomButton
+                title="Iniciar Sesión"
+                onPress={handleLogin}
+                loading={loading}
+                variant="primary"
+              />
+            </ButtonWrapper>
 
-        {loading && (
-          <LoaderWrapper>
-            <LoaderLottie size={60} />
-          </LoaderWrapper>
-        )}
-
-        <Footer>
-          <FooterText>¿No tienes cuenta? </FooterText>
-          <FooterLink onPress={() => router.push('/(auth)/register')}>
-            <FooterLinkText>Regístrate aquí</FooterLinkText>
-          </FooterLink>
-        </Footer>
-      </Container>
+            <Footer>
+              <FooterText>¿No tienes cuenta? </FooterText>
+              <FooterLink onPress={() => router.push('/(auth)/register')}>
+                <FooterLinkText>Regístrate aquí</FooterLinkText>
+              </FooterLink>
+            </Footer>
+          </FormCard>
+        </ScrollContainer>
+      </AnimatedBackground>
     </KeyboardAvoidingView>
   );
 }
 
-const Container = styled.ScrollView`
+const ScrollContainer = styled.ScrollView`
   flex: 1;
-  padding-horizontal: 32px;
+  background-color: transparent;
 `;
 
-const HeaderSection = styled.View`
+const GradientTop = styled(LinearGradient).attrs({
+  colors: [theme.colors.primary, theme.colors.primaryDark],
+  start: { x: 0, y: 0 },
+  end: { x: 1, y: 1 },
+})`
+  padding-top: 100px;
+  padding-bottom: 60px;
   align-items: center;
-  margin-top: 80px;
-  margin-bottom: 40px;
-`;
-
-const LogoIcon = styled.View`
-  width: 80px;
-  height: 80px;
-  background-color: #2563eb;
-  border-radius: 18px;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 24px;
+  border-bottom-left-radius: 40px;
+  border-bottom-right-radius: 40px;
+  overflow: hidden;
   elevation: 8;
-  shadow-color: #2563eb;
+  shadow-color: ${theme.colors.primary};
   shadow-offset: 0px 6px;
-  shadow-opacity: 0.4;
-  shadow-radius: 12px;
+  shadow-opacity: 0.3;
+  shadow-radius: 16px;
 `;
 
-const LogoText = styled.Text`
-  font-size: 36px;
-  color: #ffffff;
-  font-weight: 700;
+const LogoSection = styled.View`
+  align-items: center;
+`;
+
+const LottieContainer = styled.View`
+  margin-bottom: 16px;
 `;
 
 const Title = styled.Text`
   font-size: 28px;
   font-weight: 700;
-  color: #111827;
+  color: ${theme.colors.white};
   margin-bottom: 4px;
 `;
 
 const Subtitle = styled.Text`
   font-size: 14px;
-  color: #6b7280;
+  color: rgba(255, 255, 255, 0.8);
   text-align: center;
 `;
 
-const FormSection = styled.View`
-  width: 100%;
-  margin-bottom: 24px;
+const FormCard = styled.View`
+  margin: -30px 24px 0;
+  background-color: ${theme.colors.surface};
+  border-radius: ${theme.borderRadius.xl}px;
+  padding: 32px 24px;
+  border-width: 1px;
+  border-color: ${theme.colors.border};
 `;
 
 const Spacer = styled.View`
-  height: 14px;
+  height: 20px;
 `;
 
-const ButtonGroup = styled.View`
-  width: 100%;
-`;
-
-const LoaderWrapper = styled.View`
+const ErrorMessage = styled.Text`
+  color: ${theme.colors.error};
+  font-size: 14px;
+  font-weight: 500;
+  text-align: center;
   margin-top: 16px;
-  align-items: center;
+  margin-bottom: 8px;
+`;
+
+const ButtonWrapper = styled.View`
+  margin-top: 28px;
 `;
 
 const Footer = styled.View`
   flex-direction: row;
   justify-content: center;
-  margin-top: 32px;
-  margin-bottom: 40px;
-`;
-
-const ErrorMessage = styled.Text`
-  color: #dc2626;
-  font-size: 14px;
-  font-weight: 500;
-  text-align: center;
-  margin-bottom: 16px;
+  margin-top: 28px;
+  margin-bottom: 8px;
 `;
 
 const FooterText = styled.Text`
   font-size: 14px;
-  color: #6b7280;
+  color: ${theme.colors.textMuted};
 `;
 
 const FooterLink = styled.TouchableOpacity``;
 
 const FooterLinkText = styled.Text`
   font-size: 14px;
-  color: #2563eb;
+  color: ${theme.colors.primary};
   font-weight: 600;
 `;

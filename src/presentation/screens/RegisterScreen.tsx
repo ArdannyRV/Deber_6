@@ -1,11 +1,14 @@
 import { useState } from 'react';
 import { KeyboardAvoidingView, Platform } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import LottieView from 'lottie-react-native';
 import styled from 'styled-components/native';
 import { useRouter } from 'expo-router';
 import { useAuth } from '@/presentation/hooks/useAuth';
 import { CustomButton } from '@/presentation/components/ui/CustomButton';
 import { CustomInput } from '@/presentation/components/ui/CustomInput';
-import { LoaderLottie } from '@/presentation/components/ui/LoaderLottie';
+import { AnimatedBackground } from '@/presentation/components/ui/AnimatedBackground';
+import { theme } from '@/presentation/theme/theme';
 
 export function RegisterScreen() {
   const router = useRouter();
@@ -25,151 +28,164 @@ export function RegisterScreen() {
 
   return (
     <KeyboardAvoidingView
-      style={{ flex: 1, backgroundColor: '#ffffff' }}
+      style={{ flex: 1, backgroundColor: theme.colors.backgroundBase }}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
-      <Container>
-        <HeaderSection>
-          <LogoIcon>
-            <LogoText>C</LogoText>
-          </LogoIcon>
-          <Title>Crear Cuenta</Title>
-          <Subtitle>Regístrate para empezar a chatear</Subtitle>
-        </HeaderSection>
+      <AnimatedBackground>
+        <ScrollContainer>
+          <GradientTop>
+            <LogoSection>
+              <LottieContainer>
+                <LottieView
+                  source={require('../../../assets/animations/animacion_de_inicio.json')}
+                  autoPlay
+                  loop
+                  style={{ width: 100, height: 100 }}
+                />
+              </LottieContainer>
+              <Title>Crear Cuenta</Title>
+              <Subtitle>Regístrate para empezar a chatear</Subtitle>
+            </LogoSection>
+          </GradientTop>
 
-        <FormSection>
-          <CustomInput
-            value={name}
-            onChangeText={setName}
-            placeholder="Nombre completo"
-            autoCapitalize="words"
-          />
-          <Spacer />
-          <CustomInput
-            value={email}
-            onChangeText={setEmail}
-            placeholder="Correo electrónico"
-            keyboardType="email-address"
-            autoCapitalize="none"
-            autoCorrect={false}
-          />
-          <Spacer />
-          <CustomInput
-            value={password}
-            onChangeText={setPassword}
-            placeholder="Contraseña"
-            secureTextEntry
-          />
-        </FormSection>
+          <FormCard>
+            <CustomInput
+              value={name}
+              onChangeText={setName}
+              placeholder="Nombre completo"
+              autoCapitalize="words"
+            />
+            <Spacer />
+            <CustomInput
+              value={email}
+              onChangeText={setEmail}
+              placeholder="Correo electrónico"
+              keyboardType="email-address"
+              autoCapitalize="none"
+              autoCorrect={false}
+            />
+            <Spacer />
+            <CustomInput
+              value={password}
+              onChangeText={setPassword}
+              placeholder="Contraseña"
+              secureTextEntry
+            />
 
-        <RoleLabel>Eres...</RoleLabel>
-        <RoleGroup>
-          <RoleButton
-            onPress={() => setRole('vendedor')}
-            $active={role === 'vendedor'}
-          >
-            <RoleIcon $active={role === 'vendedor'}>🏪</RoleIcon>
-            <RoleButtonText $active={role === 'vendedor'}>
-              Vendedor
-            </RoleButtonText>
-            <RoleBadge $active={role === 'vendedor'} />
-          </RoleButton>
-          <RoleButton
-            onPress={() => setRole('cliente')}
-            $active={role === 'cliente'}
-          >
-            <RoleIcon $active={role === 'cliente'}>🛒</RoleIcon>
-            <RoleButtonText $active={role === 'cliente'}>
-              Cliente
-            </RoleButtonText>
-            <RoleBadge $active={role === 'cliente'} />
-          </RoleButton>
-        </RoleGroup>
+            <RoleLabel>Eres...</RoleLabel>
+            <RoleGroup>
+              <RoleButton
+                onPress={() => setRole('vendedor')}
+                $active={role === 'vendedor'}
+              >
+                <LottieView
+                  source={require('../../../assets/animations/vendedor.json')}
+                  autoPlay
+                  loop
+                  style={{ width: 40, height: 40 }}
+                />
+                <RoleButtonText $active={role === 'vendedor'}>
+                  Vendedor
+                </RoleButtonText>
+              </RoleButton>
+              <RoleButton
+                onPress={() => setRole('cliente')}
+                $active={role === 'cliente'}
+              >
+                <LottieView
+                  source={require('../../../assets/animations/cliente.json')}
+                  autoPlay
+                  loop
+                  style={{ width: 40, height: 40 }}
+                />
+                <RoleButtonText $active={role === 'cliente'}>
+                  Cliente
+                </RoleButtonText>
+              </RoleButton>
+            </RoleGroup>
 
-        <ButtonGroup>
-          <CustomButton
-            title="Crear Cuenta"
-            onPress={handleRegister}
-            loading={loading}
-            variant="primary"
-          />
-        </ButtonGroup>
+            <CustomButton
+              title="Crear Cuenta"
+              onPress={handleRegister}
+              loading={loading}
+              variant="primary"
+            />
 
-        {loading && (
-          <LoaderWrapper>
-            <LoaderLottie size={60} />
-          </LoaderWrapper>
-        )}
-
-        <Footer>
-          <FooterText>¿Ya tienes cuenta? </FooterText>
-          <FooterLink onPress={() => router.push('/(auth)/login')}>
-            <FooterLinkText>Inicia sesión aquí</FooterLinkText>
-          </FooterLink>
-        </Footer>
-      </Container>
+            <Footer>
+              <FooterText>¿Ya tienes cuenta? </FooterText>
+              <FooterLink onPress={() => router.push('/(auth)/login')}>
+                <FooterLinkText>Inicia sesión aquí</FooterLinkText>
+              </FooterLink>
+            </Footer>
+          </FormCard>
+        </ScrollContainer>
+      </AnimatedBackground>
     </KeyboardAvoidingView>
   );
 }
 
-const Container = styled.ScrollView`
+const ScrollContainer = styled.ScrollView`
   flex: 1;
-  padding-horizontal: 32px;
+  background-color: transparent;
 `;
 
-const HeaderSection = styled.View`
+const GradientTop = styled(LinearGradient).attrs({
+  colors: [theme.colors.primary, theme.colors.primaryDark],
+  start: { x: 0, y: 0 },
+  end: { x: 1, y: 1 },
+})`
+  padding-top: 80px;
+  padding-bottom: 50px;
   align-items: center;
-  margin-top: 60px;
-  margin-bottom: 32px;
-`;
-
-const LogoIcon = styled.View`
-  width: 72px;
-  height: 72px;
-  background-color: #2563eb;
-  border-radius: 18px;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 20px;
+  border-bottom-left-radius: 40px;
+  border-bottom-right-radius: 40px;
+  overflow: hidden;
   elevation: 8;
-  shadow-color: #2563eb;
+  shadow-color: ${theme.colors.primary};
   shadow-offset: 0px 6px;
-  shadow-opacity: 0.4;
-  shadow-radius: 12px;
+  shadow-opacity: 0.3;
+  shadow-radius: 16px;
 `;
 
-const LogoText = styled.Text`
-  font-size: 32px;
-  color: #ffffff;
-  font-weight: 700;
+const LogoSection = styled.View`
+  align-items: center;
+`;
+
+const LottieContainer = styled.View`
+  margin-bottom: 12px;
 `;
 
 const Title = styled.Text`
   font-size: 26px;
   font-weight: 700;
-  color: #111827;
+  color: ${theme.colors.white};
   margin-bottom: 4px;
 `;
 
 const Subtitle = styled.Text`
   font-size: 14px;
-  color: #6b7280;
+  color: rgba(255, 255, 255, 0.8);
   text-align: center;
 `;
 
-const FormSection = styled.View`
-  width: 100%;
-  margin-bottom: 24px;
+const FormCard = styled.View`
+  margin: -30px 24px 0;
+  background-color: ${theme.colors.surface};
+  border-radius: ${theme.borderRadius.xl}px;
+  padding: 28px 24px;
+  border-width: 1px;
+  border-color: ${theme.colors.border};
 `;
 
 const Spacer = styled.View`
-  height: 14px;
+  height: 16px;
 `;
 
 const RoleLabel = styled.Text`
   font-size: 15px;
   font-weight: 600;
-  color: #374151;
+  color: ${theme.colors.textMuted};
+  margin-top: 20px;
   margin-bottom: 12px;
   text-align: center;
 `;
@@ -183,58 +199,39 @@ const RoleGroup = styled.View`
 const RoleButton = styled.TouchableOpacity<{ $active: boolean }>`
   flex: 1;
   align-items: center;
-  padding: 20px 16px;
-  border-radius: 16px;
+  padding: 12px 16px;
+  border-radius: ${theme.borderRadius.md}px;
   border-width: 2px;
-  border-color: ${({ $active }) => ($active ? '#2563eb' : '#e5e7eb')};
-  background-color: ${({ $active }) => ($active ? '#eff6ff' : '#ffffff')};
-`;
-
-const RoleIcon = styled.Text<{ $active: boolean }>`
-  font-size: 28px;
-  margin-bottom: 8px;
+  border-color: ${({ $active }) =>
+    $active ? theme.colors.primary : theme.colors.border};
+  background-color: ${({ $active }) =>
+    $active ? '#EFF6FF' : theme.colors.surface};
 `;
 
 const RoleButtonText = styled.Text<{ $active: boolean }>`
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 600;
-  color: ${({ $active }) => ($active ? '#2563eb' : '#6b7280')};
-`;
-
-const RoleBadge = styled.View<{ $active: boolean }>`
-  width: 10px;
-  height: 10px;
-  border-radius: 5px;
-  background-color: ${({ $active }) => ($active ? '#2563eb' : 'transparent')};
-  margin-top: 8px;
-`;
-
-const ButtonGroup = styled.View`
-  width: 100%;
-  margin-bottom: 8px;
-`;
-
-const LoaderWrapper = styled.View`
-  margin-top: 16px;
-  align-items: center;
+  margin-top: 6px;
+  color: ${({ $active }) =>
+    $active ? theme.colors.primary : theme.colors.textMuted};
 `;
 
 const Footer = styled.View`
   flex-direction: row;
   justify-content: center;
   margin-top: 24px;
-  margin-bottom: 40px;
+  margin-bottom: 8px;
 `;
 
 const FooterText = styled.Text`
   font-size: 14px;
-  color: #6b7280;
+  color: ${theme.colors.textMuted};
 `;
 
 const FooterLink = styled.TouchableOpacity``;
 
 const FooterLinkText = styled.Text`
   font-size: 14px;
-  color: #2563eb;
+  color: ${theme.colors.primary};
   font-weight: 600;
 `;

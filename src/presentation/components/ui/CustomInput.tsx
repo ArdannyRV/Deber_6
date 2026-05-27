@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { TextInput } from 'react-native';
 import styled from 'styled-components/native';
+import { theme } from '@/presentation/theme/theme';
 
 interface Props {
   value: string;
@@ -26,30 +27,39 @@ export function CustomInput({
   const [isFocused, setIsFocused] = useState(false);
 
   return (
-    <StyledInput
-      value={value}
-      onChangeText={onChangeText}
-      placeholder={placeholder}
-      placeholderTextColor="#9ca3af"
-      secureTextEntry={secureTextEntry}
-      keyboardType={keyboardType}
-      autoCapitalize={autoCapitalize}
-      autoCorrect={autoCorrect}
-      onSubmitEditing={onSubmitEditing}
-      onFocus={() => setIsFocused(true)}
-      onBlur={() => setIsFocused(false)}
-      $isFocused={isFocused}
-    />
+    <InputWrapper $isFocused={isFocused}>
+      <StyledInput
+        value={value}
+        onChangeText={onChangeText}
+        placeholder={placeholder}
+        placeholderTextColor={theme.colors.textMuted}
+        secureTextEntry={secureTextEntry}
+        keyboardType={keyboardType}
+        autoCapitalize={autoCapitalize}
+        autoCorrect={autoCorrect}
+        onSubmitEditing={onSubmitEditing}
+        onFocus={() => setIsFocused(true)}
+        onBlur={() => setIsFocused(false)}
+      />
+    </InputWrapper>
   );
 }
 
-const StyledInput = styled(TextInput)<{ $isFocused: boolean }>`
+const InputWrapper = styled.View<{ $isFocused: boolean }>`
+  flex-direction: row;
+  align-items: center;
+  background-color: ${theme.colors.surface};
+  border-radius: ${theme.borderRadius.md}px;
   border-width: 2px;
-  border-color: ${({ $isFocused }) => ($isFocused ? '#2563eb' : '#e5e7eb')};
-  border-radius: 14px;
-  padding: 14px 16px;
+  border-color: ${({ $isFocused }) =>
+    $isFocused ? theme.colors.borderFocus : theme.colors.border};
+  padding-horizontal: 16px;
+`;
+
+const StyledInput = styled(TextInput)`
+  flex: 1;
+  padding: 14px 0;
   font-size: 16px;
-  color: #111827;
-  background-color: ${({ $isFocused }) =>
-    $isFocused ? '#fafafa' : '#f9fafb'};
+  color: ${theme.colors.textMain};
+  background-color: transparent;
 `;

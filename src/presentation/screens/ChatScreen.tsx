@@ -11,8 +11,10 @@ import styled from 'styled-components/native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useAuth } from '@/presentation/hooks/useAuth';
 import { useChat } from '@/presentation/hooks/useChat';
+import { GlassHeader } from '@/presentation/components/ui/GlassHeader';
 import { MessageBubble } from '@/presentation/components/chat/MessageBubble';
 import { Message } from '@/domain/entities/Message';
+import { theme } from '@/presentation/theme/theme';
 
 export function ChatScreen() {
   const router = useRouter();
@@ -25,6 +27,7 @@ export function ChatScreen() {
     }>();
 
   const [inputText, setInputText] = useState('');
+  const [isInputFocused, setIsInputFocused] = useState(false);
   const flatListRef = useRef<FlatList<Message>>(null);
 
   const currentUserId = user?.id ?? '';
@@ -52,136 +55,51 @@ export function ChatScreen() {
   );
 
   return (
-    <Container
+    <KeyboardAvoidingView
+      style={{ flex: 1, backgroundColor: theme.colors.backgroundBase }}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
     >
-      <Header>
-        <BackButton onPress={() => router.back()}>
-          <BackIcon>{'‹'}</BackIcon>
-          <BackText>Volver</BackText>
-        </BackButton>
-        <HeaderCenter>
-          <Avatar>
-            <AvatarText>
-              {receiverName?.charAt(0).toUpperCase() ?? '?'}
-            </AvatarText>
-          </Avatar>
-          <HeaderInfo>
-            <HeaderName>{receiverName}</HeaderName>
-            <HeaderRole>
-              {receiverRole === 'vendedor' ? 'Vendedor' : 'Cliente'}
-            </HeaderRole>
-          </HeaderInfo>
-        </HeaderCenter>
-      </Header>
-
-      <MessageList
-        ref={flatListRef}
-        data={messages}
-        keyExtractor={(item: Message) => item.id}
-        renderItem={renderMessage}
-        contentContainerStyle={{ paddingVertical: 8 }}
-        onContentSizeChange={() =>
-          flatListRef.current?.scrollToEnd({ animated: false })
-        }
-      />
-
-      <InputBar>
-        <InputRow>
-          <ChatInput
-            value={inputText}
-            onChangeText={setInputText}
-            placeholder="Escribe un mensaje..."
-            placeholderTextColor="#9ca3af"
-            onSubmitEditing={handleSend}
-          />
-          <SendButton onPress={handleSend} disabled={!inputText.trim()}>
-            <SendIcon>{'→'}</SendIcon>
-          </SendButton>
-        </InputRow>
-      </InputBar>
-    </Container>
+      <Container>
+        <GlassHeader
+          title={receiverName ?? 'Chat'}
+          subtitle={receiverRole === 'vendedor' ? 'Vendedor' : 'Cliente'}
+          onBackPress={() => router.back()}
+        />
+        <MessageList
+          ref={flatListRef}
+          data={messages}
+          keyExtractor={(item: Message) => item.id}
+          renderItem={renderMessage}
+          contentContainerStyle={{ paddingTop: 110, paddingBottom: 8 }}
+          onContentSizeChange={() =>
+            flatListRef.current?.scrollToEnd({ animated: false })
+          }
+        />
+        <InputBar $isFocused={isInputFocused}>
+          <InputRow>
+            <ChatInput
+              value={inputText}
+              onChangeText={setInputText}
+              placeholder="Escribe un mensaje..."
+              placeholderTextColor={theme.colors.textMuted}
+              onSubmitEditing={handleSend}
+              onFocus={() => setIsInputFocused(true)}
+              onBlur={() => setIsInputFocused(false)}
+            />
+            <SendButton onPress={handleSend} disabled={!inputText.trim()}>
+              <SendIcon>{'→'}</SendIcon>
+            </SendButton>
+          </InputRow>
+        </InputBar>
+      </Container>
+    </KeyboardAvoidingView>
   );
 }
 
-const Container = styled(KeyboardAvoidingView)`
+const Container = styled.View`
   flex: 1;
-  background-color: #f9fafb;
-`;
-
-const Header = styled.View`
-  background-color: #ffffff;
-  border-bottom-width: 1px;
-  border-bottom-color: #e5e7eb;
-  padding: 12px 16px;
-  padding-top: 56px;
-  flex-direction: row;
-  align-items: center;
-  elevation: 2;
-  shadow-color: #000;
-  shadow-offset: 0px 1px;
-  shadow-opacity: 0.08;
-  shadow-radius: 4px;
-`;
-
-const BackButton = styled(TouchableOpacity)`
-  flex-direction: row;
-  align-items: center;
-  padding: 6px 10px;
-  margin-right: 8px;
-  border-radius: 8px;
-  background-color: #f3f4f6;
-`;
-
-const BackIcon = styled.Text`
-  font-size: 22px;
-  color: #374151;
-  line-height: 24px;
-  margin-right: 2px;
-`;
-
-const BackText = styled.Text`
-  font-size: 15px;
-  color: #374151;
-  font-weight: 600;
-`;
-
-const HeaderCenter = styled.View`
-  flex: 1;
-  flex-direction: row;
-  align-items: center;
-`;
-
-const Avatar = styled.View`
-  width: 36px;
-  height: 36px;
-  background-color: #2563eb;
-  border-radius: 18px;
-  align-items: center;
-  justify-content: center;
-  margin-right: 10px;
-`;
-
-const AvatarText = styled.Text`
-  color: #ffffff;
-  font-weight: 700;
-  font-size: 14px;
-`;
-
-const HeaderInfo = styled.View`
-  flex: 1;
-`;
-
-const HeaderName = styled.Text`
-  font-size: 16px;
-  font-weight: 700;
-  color: #111827;
-`;
-
-const HeaderRole = styled.Text`
-  font-size: 12px;
-  color: #6b7280;
+  background-color: ${theme.colors.backgroundBase};
 `;
 
 const MessageList = styled(FlatList)`
@@ -189,48 +107,45 @@ const MessageList = styled(FlatList)`
   padding-horizontal: 4px;
 ` as unknown as typeof FlatList;
 
-const InputBar = styled.View`
-  background-color: #ffffff;
-  border-top-width: 1px;
-  border-top-color: #e5e7eb;
-  padding: 12px 16px;
-  padding-bottom: 24px;
+const InputBar = styled.View<{ $isFocused: boolean }>`
+  margin: 8px 16px 36px;
+  border-radius: 28px;
+  background-color: ${theme.colors.surface};
+  border-width: 2px;
+  border-color: ${({ $isFocused }) =>
+    $isFocused ? theme.colors.borderFocus : theme.colors.border};
+  padding: 6px 6px 6px 18px;
+  elevation: 2;
+  shadow-color: #000;
+  shadow-offset: 0px 2px;
+  shadow-opacity: 0.06;
+  shadow-radius: 6px;
 `;
 
 const InputRow = styled.View`
   flex-direction: row;
   align-items: center;
-  gap: 8px;
 `;
 
 const ChatInput = styled.TextInput`
   flex: 1;
-  border-width: 2px;
-  border-color: #e5e7eb;
-  border-radius: 24px;
-  padding: 12px 18px;
   font-size: 16px;
-  color: #111827;
-  background-color: #f9fafb;
+  color: ${theme.colors.textMain};
+  padding: 8px 0;
 `;
 
 const SendButton = styled(TouchableOpacity)<{ disabled?: boolean }>`
-  width: 48px;
-  height: 48px;
-  background-color: #2563eb;
-  border-radius: 24px;
+  width: 44px;
+  height: 44px;
+  background-color: ${theme.colors.primary};
+  border-radius: 22px;
   align-items: center;
   justify-content: center;
-  elevation: 4;
-  shadow-color: #2563eb;
-  shadow-offset: 0px 3px;
-  shadow-opacity: 0.3;
-  shadow-radius: 6px;
   opacity: ${({ disabled }) => (disabled ? 0.4 : 1)};
 `;
 
 const SendIcon = styled.Text`
-  color: #ffffff;
-  font-size: 22px;
-  line-height: 22px;
+  color: ${theme.colors.white};
+  font-size: 20px;
+  line-height: 20px;
 `;

@@ -1,10 +1,13 @@
 import { TouchableOpacity, ActivityIndicator } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import styled from 'styled-components/native';
+import { theme } from '@/presentation/theme/theme';
 
 interface Props {
   title: string;
   onPress: () => void;
   loading?: boolean;
+  disabled?: boolean;
   variant?: 'primary' | 'secondary';
 }
 
@@ -12,41 +15,77 @@ export function CustomButton({
   title,
   onPress,
   loading,
+  disabled,
   variant = 'primary',
 }: Props) {
   return (
-    <ButtonContainer onPress={onPress} disabled={loading} $variant={variant}>
-      {loading ? (
-        <ActivityIndicator
-          color={variant === 'primary' ? '#fff' : '#2563eb'}
-        />
+    <ButtonTouchable
+      onPress={onPress}
+      disabled={loading || disabled}
+      $variant={variant}
+    >
+      {variant === 'primary' ? (
+        <GradientBG>
+          {loading ? (
+            <ActivityIndicator color={theme.colors.white} />
+          ) : (
+            <ButtonText>{title}</ButtonText>
+          )}
+        </GradientBG>
       ) : (
-        <ButtonText $variant={variant}>{title}</ButtonText>
+        <SecondaryContent>
+          {loading ? (
+            <ActivityIndicator color={theme.colors.primary} />
+          ) : (
+            <SecondaryText>{title}</SecondaryText>
+          )}
+        </SecondaryContent>
       )}
-    </ButtonContainer>
+    </ButtonTouchable>
   );
 }
 
-const ButtonContainer = styled(TouchableOpacity)<{ $variant: 'primary' | 'secondary' }>`
-  background-color: ${({ $variant }) =>
-    $variant === 'primary' ? '#2563eb' : 'transparent'};
-  border-width: ${({ $variant }) => ($variant === 'secondary' ? '2px' : '0px')};
-  border-color: #2563eb;
-  border-radius: 16px;
+const ButtonTouchable = styled(TouchableOpacity)<{ $variant: 'primary' | 'secondary' }>`
+  width: 100%;
+  opacity: ${({ disabled }) => (disabled ? 0.5 : 1)};
+`;
+
+const GradientBG = styled(LinearGradient).attrs({
+  colors: [theme.colors.primary, theme.colors.primaryDark],
+  start: { x: 0, y: 0 },
+  end: { x: 1, y: 1 },
+})`
+  border-radius: ${theme.borderRadius.md}px;
   padding: 16px 24px;
   align-items: center;
   justify-content: center;
-  opacity: ${({ disabled }) => (disabled ? 0.5 : 1)};
-  elevation: ${({ $variant }) => ($variant === 'primary' ? 6 : 0)};
-  shadow-color: #2563eb;
+  elevation: 4;
+  shadow-color: ${theme.colors.primary};
   shadow-offset: 0px 4px;
-  shadow-opacity: ${({ $variant }) => ($variant === 'primary' ? 0.35 : 0)};
+  shadow-opacity: 0.25;
   shadow-radius: 8px;
 `;
 
-const ButtonText = styled.Text<{ $variant: 'primary' | 'secondary' }>`
-  color: ${({ $variant }) => ($variant === 'primary' ? '#fff' : '#2563eb')};
+const SecondaryContent = styled.View`
+  border-radius: ${theme.borderRadius.md}px;
+  padding: 16px 24px;
+  align-items: center;
+  justify-content: center;
+  border-width: 2px;
+  border-color: ${theme.colors.primary};
+  background-color: transparent;
+`;
+
+const ButtonText = styled.Text`
   font-size: 17px;
   font-weight: 700;
   text-align: center;
+  color: ${theme.colors.white};
+`;
+
+const SecondaryText = styled.Text`
+  font-size: 17px;
+  font-weight: 700;
+  text-align: center;
+  color: ${theme.colors.primary};
 `;
